@@ -6,6 +6,12 @@ interface Balance {
   total: number;
 }
 
+interface CreateTransactionDTO {
+  title: string;
+  value: number;
+  type: 'income' | 'outcome';
+}
+
 class TransactionsRepository {
   private transactions: Transaction[];
 
@@ -14,15 +20,29 @@ class TransactionsRepository {
   }
 
   public all(): Transaction[] {
-    // TODO
+    return this.transactions;
   }
 
   public getBalance(): Balance {
-    // TODO
+    return this.transactions.reduce(
+      (b, transaction) => {
+        const bp = b;
+
+        if (transaction.type === 'income') bp.income += transaction.value;
+        else bp.outcome = transaction.value;
+
+        bp.total = bp.income - bp.outcome;
+
+        return bp;
+      },
+      { income: 0, outcome: 0, total: 0 },
+    );
   }
 
-  public create(): Transaction {
-    // TODO
+  public create(createTransactionDTO: CreateTransactionDTO): Transaction {
+    const transaction = new Transaction(createTransactionDTO);
+    this.transactions.push(transaction);
+    return transaction;
   }
 }
 
